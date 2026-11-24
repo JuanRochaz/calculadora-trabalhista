@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { calcularDecimo, type ResultadoDecimo, type TipoDecimo } from '../calc/decimo'
 import { EntradaInvalidaError } from '../calc/erros'
-import { formatarReais } from '../calc/util'
+import { formatarDataBr, formatarReais } from '../calc/util'
 import {
   BotaoCalcular,
   CampoData,
@@ -12,6 +12,10 @@ import {
 } from '../components/Formulario'
 import ResultadoDetalhado from '../components/ResultadoDetalhado'
 import { tabelasVigentes } from '../config/tabelas'
+import type { ItemPdf } from '../pdf/gerarPdf'
+
+/** Inclui o item só se o valor existir (para os campos opcionais no PDF). */
+const se = (condicao: unknown, item: ItemPdf): ItemPdf[] => (condicao ? [item] : [])
 
 const ano = tabelasVigentes.ano
 
@@ -37,9 +41,11 @@ export default function Decimo() {
   const [pensao, setPensao] = useState<number | null>(null)
   const [primeiraPaga, setPrimeiraPaga] = useState<number | null>(null)
   const [erro, setErro] = useState<string | null>(null)
-  const [resultado, setResultado] = useState<{ tipo: TipoDecimo; dados: ResultadoDecimo } | null>(
-    null,
-  )
+  const [resultado, setResultado] = useState<{
+    tipo: TipoDecimo
+    dados: ResultadoDecimo
+    informados: ItemPdf[]
+  } | null>(null)
 
   function calcular(e: FormEvent) {
     e.preventDefault()
@@ -59,7 +65,25 @@ export default function Decimo() {
         },
         tabelasVigentes,
       )
-      setResultado({ tipo, dados })
+      const informados: ItemPdf[] = [
+        { rotulo: 'Salário mensal', valor: formatarReais(salario ?? 0) },
+        ...se(media, { rotulo: 'Média de variáveis', valor: formatarReais(media ?? 0) }),
+        { rotulo: 'Admissão', valor: formatarDataBr(admissao) },
+        ...se(tipo === 'proporcional', {
+          rotulo: 'Desligamento',
+          valor: desligamento ? formatarDataBr(desligamento) : '',
+        }),
+        ...se(tipo !== 'primeira', { rotulo: 'Dependentes', valor: String(dependentes) }),
+        ...se(tipo !== 'primeira' && pensao, {
+          rotulo: 'Pensão alimentícia',
+          valor: formatarReais(pensao ?? 0),
+        }),
+        ...se(tipo !== 'primeira' && primeiraPaga !== null, {
+          rotulo: '1ª parcela já paga',
+          valor: formatarReais(primeiraPaga ?? 0),
+        }),
+      ]
+      setResultado({ tipo, dados, informados })
     } catch (falha) {
       setResultado(null)
       if (falha instanceof Error) setErro(falha.message)
@@ -174,6 +198,7 @@ export default function Decimo() {
               valor: formatarReais(resultado.dados.valorDecimoCentavos),
             },
           ]}
+          pdf={{ calculadora: 'decimo-terceiro', dadosInformados: resultado.informados }}
         />
       )}
     </section>

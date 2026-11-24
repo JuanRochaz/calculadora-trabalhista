@@ -10,7 +10,12 @@ import {
   MensagemErro,
 } from '../components/Formulario'
 import ResultadoDetalhado from '../components/ResultadoDetalhado'
+import { formatarDataBr, formatarReais } from '../calc/util'
 import { tabelasVigentes } from '../config/tabelas'
+import type { ItemPdf } from '../pdf/gerarPdf'
+
+/** Inclui o item só se o valor existir (para os campos opcionais no PDF). */
+const se = (condicao: unknown, item: ItemPdf): ItemPdf[] => (condicao ? [item] : [])
 
 const tipos: { valor: TipoFerias; rotulo: string; descricao: string }[] = [
   {
@@ -39,9 +44,11 @@ export default function Ferias() {
   const [inicio, setInicio] = useState('')
   const [saida, setSaida] = useState('')
   const [erro, setErro] = useState<string | null>(null)
-  const [resultado, setResultado] = useState<{ tipo: TipoFerias; dados: ResultadoFerias } | null>(
-    null,
-  )
+  const [resultado, setResultado] = useState<{
+    tipo: TipoFerias
+    dados: ResultadoFerias
+    informados: ItemPdf[]
+  } | null>(null)
 
   function calcular(e: FormEvent) {
     e.preventDefault()
@@ -66,7 +73,22 @@ export default function Ferias() {
         },
         tabelasVigentes,
       )
-      setResultado({ tipo, dados })
+      const informados: ItemPdf[] = [
+        { rotulo: 'Salário mensal', valor: formatarReais(salario ?? 0) },
+        ...se(media, { rotulo: 'Média de variáveis', valor: formatarReais(media ?? 0) }),
+        { rotulo: 'Faltas injustificadas', valor: String(faltas ?? 0) },
+        ...(tipo === 'gozo'
+          ? [
+              { rotulo: 'Dias vendidos', valor: String(diasAbono ?? 0) },
+              { rotulo: 'Dependentes', valor: String(dependentes ?? 0) },
+              ...se(pensao, { rotulo: 'Pensão alimentícia', valor: formatarReais(pensao ?? 0) }),
+            ]
+          : [
+              { rotulo: 'Início do período aquisitivo', valor: formatarDataBr(inicio) },
+              { rotulo: 'Data de saída', valor: formatarDataBr(saida) },
+            ]),
+      ]
+      setResultado({ tipo, dados, informados })
     } catch (falha) {
       setResultado(null)
       if (falha instanceof Error) setErro(falha.message)
@@ -205,6 +227,7 @@ export default function Ferias() {
           titulo={resultado.tipo === 'gozo' ? 'Férias' : 'Férias proporcionais'}
           resultado={resultado.dados}
           resumo={resumo}
+          pdf={{ calculadora: 'ferias', dadosInformados: resultado.informados }}
         />
       )}
     </section>

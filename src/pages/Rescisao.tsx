@@ -7,7 +7,7 @@ import {
   type TipoAviso,
   type TipoRescisao,
 } from '../calc/rescisao'
-import { formatarReais, lerData } from '../calc/util'
+import { formatarDataBr, formatarReais } from '../calc/util'
 import {
   BotaoCalcular,
   CampoCaixa,
@@ -19,6 +19,10 @@ import {
 } from '../components/Formulario'
 import ResultadoDetalhado from '../components/ResultadoDetalhado'
 import { tabelasVigentes } from '../config/tabelas'
+import type { ItemPdf, SecaoPdf } from '../pdf/gerarPdf'
+
+/** Inclui o item só se o valor existir (para os campos opcionais no PDF). */
+const se = (condicao: unknown, item: ItemPdf): ItemPdf[] => (condicao ? [item] : [])
 
 const tipos: { valor: TipoRescisao; rotulo: string; descricao: string }[] = [
   { valor: 'semJustaCausa', rotulo: 'Sem justa causa', descricao: 'A empresa demitiu.' },
@@ -36,8 +40,35 @@ const avisos: Record<TipoAviso, { rotulo: string; descricao: string }> = {
 
 const temMulta = (t: TipoRescisao) => t === 'semJustaCausa' || t === 'acordo'
 
-function formatarData(iso: string): string {
-  return lerData(iso).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
+const NOTA_SEM_MULTA =
+  'Neste tipo de rescisão não há multa e o saldo do FGTS não é liberado para saque.'
+
+/** Itens do FGTS, usados na tela e no PDF. */
+function itensFgts(tipo: TipoRescisao, dados: ResultadoRescisao) {
+  const { fgts } = dados
+  return [
+    { rotulo: 'Depósito de 8% sobre a rescisão', valor: fgts.depositoRescisaoCentavos },
+    ...(temMulta(tipo)
+      ? [
+          {
+            rotulo: `Multa de ${Math.round(fgts.percentualMulta * 100)}% (paga na conta do FGTS)`,
+            valor: fgts.multaCentavos,
+          },
+          {
+            rotulo: tipo === 'acordo' ? 'Saque estimado (80% do saldo + multa)' : 'Saque estimado',
+            valor: fgts.saqueCentavos,
+          },
+        ]
+      : []),
+  ]
+}
+
+function secaoFgtsPdf(tipo: TipoRescisao, dados: ResultadoRescisao): SecaoPdf {
+  return {
+    titulo: 'FGTS',
+    itens: itensFgts(tipo, dados).map((i) => ({ rotulo: i.rotulo, valor: formatarReais(i.valor) })),
+    nota: temMulta(tipo) ? undefined : NOTA_SEM_MULTA,
+  }
 }
 
 export default function Rescisao() {
@@ -59,6 +90,7 @@ export default function Rescisao() {
     tipo: TipoRescisao
     aviso: TipoAviso | null
     dados: ResultadoRescisao
+    informados: ItemPdf[]
   } | null>(null)
 
   const avisosPermitidos = AVISOS_POR_TIPO[tipo]
@@ -95,7 +127,32 @@ export default function Rescisao() {
         },
         tabelasVigentes,
       )
-      setResultado({ tipo, aviso: avisoUsado, dados })
+      const informados: ItemPdf[] = [
+        { rotulo: 'Salário mensal', valor: formatarReais(salario ?? 0) },
+        ...se(media, { rotulo: 'Média de variáveis', valor: formatarReais(media ?? 0) }),
+        { rotulo: 'Admissão', valor: formatarDataBr(admissao) },
+        {
+          rotulo: avisoUsado === 'indenizado' ? 'Comunicação do aviso' : 'Último dia trabalhado',
+          valor: formatarDataBr(desligamento),
+        },
+        ...se(avisoUsado, {
+          rotulo: 'Aviso prévio',
+          valor: avisoUsado ? avisos[avisoUsado].rotulo : '',
+        }),
+        ...se(temMulta(tipo), { rotulo: 'Saldo do FGTS', valor: formatarReais(saldoFgts ?? 0) }),
+        {
+          rotulo: 'Férias vencidas',
+          valor: `${periodosVencidos ?? 0} período(s)${emDobro && (periodosVencidos ?? 0) > 0 ? ', 1 em dobro' : ''}`,
+        },
+        ...se(faltas, { rotulo: 'Faltas injustificadas', valor: String(faltas) }),
+        ...se(primeiraParcela, {
+          rotulo: '1ª parcela do 13º paga',
+          valor: formatarReais(primeiraParcela ?? 0),
+        }),
+        { rotulo: 'Dependentes', valor: String(dependentes ?? 0) },
+        ...se(pensao, { rotulo: 'Pensão alimentícia', valor: formatarReais(pensao ?? 0) }),
+      ]
+      setResultado({ tipo, aviso: avisoUsado, dados, informados })
     } catch (falha) {
       setResultado(null)
       if (falha instanceof Error) setErro(falha.message)
@@ -108,7 +165,7 @@ export default function Rescisao() {
     ...(resultado.aviso === 'indenizado'
       ? [
           { rotulo: 'Aviso prévio', valor: `${dados.diasAviso} dias` },
-          { rotulo: 'Projeção até', valor: formatarData(dados.dataFimProjetada) },
+          { rotulo: 'Projeção até', valor: formatarDataBr(dados.dataFimProjetada) },
         ]
       : []),
     ...(resultado.tipo !== 'justaCausa'
@@ -267,9 +324,14 @@ export default function Rescisao() {
       {resultado && dados && resumo && (
         <>
           <ResultadoDetalhado
-            titulo={tipos.find((t) => t.valor === resultado.tipo)!.rotulo}
+            titulo={`Rescisão – ${tipos.find((t) => t.valor === resultado.tipo)!.rotulo.toLowerCase()}`}
             resultado={dados}
             resumo={resumo}
+            pdf={{
+              calculadora: 'rescisao',
+              dadosInformados: resultado.informados,
+              extras: [secaoFgtsPdf(resultado.tipo, dados)],
+            }}
           />
           <ResumoFgts tipo={resultado.tipo} dados={dados} />
         </>
@@ -279,22 +341,7 @@ export default function Rescisao() {
 }
 
 function ResumoFgts({ tipo, dados }: { tipo: TipoRescisao; dados: ResultadoRescisao }) {
-  const { fgts } = dados
-  const itens = [
-    { rotulo: 'Depósito de 8% sobre a rescisão', valor: fgts.depositoRescisaoCentavos },
-    ...(temMulta(tipo)
-      ? [
-          {
-            rotulo: `Multa de ${Math.round(fgts.percentualMulta * 100)}% (paga na conta do FGTS)`,
-            valor: fgts.multaCentavos,
-          },
-          {
-            rotulo: tipo === 'acordo' ? 'Saque estimado (80% do saldo + multa)' : 'Saque estimado',
-            valor: fgts.saqueCentavos,
-          },
-        ]
-      : []),
-  ]
+  const itens = itensFgts(tipo, dados)
   return (
     <section className="mt-4 rounded-md border border-linha p-4">
       <h3 className="text-lg">FGTS</h3>
@@ -306,11 +353,7 @@ function ResumoFgts({ tipo, dados }: { tipo: TipoRescisao; dados: ResultadoResci
           </div>
         ))}
       </dl>
-      {!temMulta(tipo) && (
-        <p className="mt-2 text-xs text-texto-suave">
-          Neste tipo de rescisão não há multa e o saldo do FGTS não é liberado para saque.
-        </p>
-      )}
+      {!temMulta(tipo) && <p className="mt-2 text-xs text-texto-suave">{NOTA_SEM_MULTA}</p>}
     </section>
   )
 }

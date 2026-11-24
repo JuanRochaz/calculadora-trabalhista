@@ -3,6 +3,7 @@ import { EntradaInvalidaError } from '../calc/erros'
 import {
   calcularHoraExtra,
   divisorPorJornada,
+  formatarHoras,
   lerHoras,
   type ResultadoHoraExtra,
 } from '../calc/horaExtra'
@@ -17,6 +18,10 @@ import {
 } from '../components/Formulario'
 import ResultadoDetalhado from '../components/ResultadoDetalhado'
 import { tabelasVigentes } from '../config/tabelas'
+import type { ItemPdf } from '../pdf/gerarPdf'
+
+/** Inclui o item só se o valor existir (para os campos opcionais no PDF). */
+const se = (condicao: unknown, item: ItemPdf): ItemPdf[] => (condicao ? [item] : [])
 
 const ano = tabelasVigentes.ano
 
@@ -57,6 +62,7 @@ export default function HoraExtra() {
   const [erro, setErro] = useState<string | null>(null)
   const [resultado, setResultado] = useState<{
     dados: ResultadoHoraExtra
+    informados: ItemPdf[]
     divisor: number
     mes: number
   } | null>(null)
@@ -87,7 +93,17 @@ export default function HoraExtra() {
         },
         tabelasVigentes,
       )
-      setResultado({ dados, divisor: divisorUsado, mes: Number(mes) })
+      const informados: ItemPdf[] = [
+        { rotulo: 'Salário mensal', valor: formatarReais(salario ?? 0) },
+        { rotulo: 'Mês', valor: opcoesMeses[Number(mes) - 1].rotulo },
+        ...se(jornada, { rotulo: 'Jornada semanal', valor: `${jornada}h` }),
+        { rotulo: 'Horas extras a 50%', valor: `${formatarHoras(minutos50)} h` },
+        { rotulo: 'Horas extras a 100%', valor: `${formatarHoras(minutos100)} h` },
+        { rotulo: 'Feriados no mês', valor: String(feriados ?? 0) },
+        { rotulo: 'Dependentes', valor: String(dependentes ?? 0) },
+        ...se(pensao, { rotulo: 'Pensão alimentícia', valor: formatarReais(pensao ?? 0) }),
+      ]
+      setResultado({ dados, divisor: divisorUsado, mes: Number(mes), informados })
     } catch (falha) {
       setResultado(null)
       if (falha instanceof Error) setErro(falha.message)
@@ -199,6 +215,7 @@ export default function HoraExtra() {
               valor: `${resultado.dados.domingos} + ${resultado.dados.feriados}`,
             },
           ]}
+          pdf={{ calculadora: 'horas-extras', dadosInformados: resultado.informados }}
         />
       )}
     </section>

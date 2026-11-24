@@ -1,5 +1,7 @@
 import type { Resultado } from '../calc/resultado'
 import { formatarReais } from '../calc/util'
+import type { ItemPdf, SecaoPdf } from '../pdf/gerarPdf'
+import BotaoPDF from './BotaoPDF'
 
 const formatarDesconto = (centavos: number) =>
   centavos === 0 ? formatarReais(0) : `− ${formatarReais(centavos)}`
@@ -9,9 +11,11 @@ interface Props {
   resultado: Resultado
   /** Informações extras mostradas acima da tabela (ex.: avos considerados). */
   resumo?: { rotulo: string; valor: string }[]
+  /** Dados para o PDF: o que o usuário informou e seções extras (ex.: FGTS). */
+  pdf?: { calculadora: string; dadosInformados: ItemPdf[]; extras?: SecaoPdf[] }
 }
 
-export default function ResultadoDetalhado({ titulo, resultado, resumo }: Props) {
+export default function ResultadoDetalhado({ titulo, resultado, resumo, pdf }: Props) {
   return (
     <section aria-live="polite" className="mt-12">
       <p className="font-mono text-xs text-texto-suave">02 / resultado</p>
@@ -84,6 +88,19 @@ export default function ResultadoDetalhado({ titulo, resultado, resumo }: Props)
           {formatarReais(resultado.liquidoCentavos)}
         </span>
       </div>
+
+      {pdf && (
+        <BotaoPDF
+          calculadora={pdf.calculadora}
+          parametros={{
+            titulo,
+            dadosInformados: pdf.dadosInformados,
+            resumo,
+            resultado,
+            extras: pdf.extras,
+          }}
+        />
+      )}
     </section>
   )
 }
