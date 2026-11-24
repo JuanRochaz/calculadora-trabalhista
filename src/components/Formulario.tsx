@@ -141,6 +141,61 @@ export function CampoInteiro({
   )
 }
 
+interface PropsHoras {
+  id: string
+  rotulo: string
+  ajuda?: string
+  valor: string
+  aoMudar: (texto: string) => void
+}
+
+/** Campo de horas no formato da folha de ponto ("10:30"). A leitura fica em calc/horaExtra. */
+export function CampoHoras({ id, rotulo, ajuda, valor, aoMudar }: PropsHoras) {
+  return (
+    <Rotulo id={id} rotulo={rotulo} ajuda={ajuda}>
+      <input
+        id={id}
+        inputMode="decimal"
+        autoComplete="off"
+        placeholder="0:00"
+        aria-describedby={ajuda ? `${id}-ajuda` : undefined}
+        className={`${classeCampo} font-mono`}
+        value={valor}
+        onChange={(e) => aoMudar(e.target.value.replace(/[^\d:h,.]/gi, '').slice(0, 7))}
+      />
+    </Rotulo>
+  )
+}
+
+interface PropsSelecao {
+  id: string
+  rotulo: string
+  ajuda?: string
+  opcoes: { valor: string; rotulo: string }[]
+  valor: string
+  aoMudar: (valor: string) => void
+}
+
+export function CampoSelecao({ id, rotulo, ajuda, opcoes, valor, aoMudar }: PropsSelecao) {
+  return (
+    <Rotulo id={id} rotulo={rotulo} ajuda={ajuda}>
+      <select
+        id={id}
+        aria-describedby={ajuda ? `${id}-ajuda` : undefined}
+        className={classeCampo}
+        value={valor}
+        onChange={(e) => aoMudar(e.target.value)}
+      >
+        {opcoes.map((o) => (
+          <option key={o.valor} value={o.valor}>
+            {o.rotulo}
+          </option>
+        ))}
+      </select>
+    </Rotulo>
+  )
+}
+
 interface PropsOpcoes<T extends string> {
   nome: string
   rotulo: string
