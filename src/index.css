@@ -30,7 +30,7 @@
     color-scheme: dark;
   }
   body {
-    @apply bg-fundo text-texto font-sans antialiased;
+    @apply bg-fundo font-sans text-texto antialiased;
   }
   h1,
   h2,

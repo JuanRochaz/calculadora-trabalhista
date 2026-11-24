@@ -18,11 +18,18 @@ const calculadoras = [
 export default function Home() {
   return (
     <section>
-      <p className="text-texto-suave font-mono text-xs">01 / calculadoras</p>
+      <title>
+        Calculadoras trabalhistas grátis 2026: rescisão, férias, 13º e horas extras | JR Dev
+      </title>
+      <meta
+        name="description"
+        content="Calcule de graça rescisão, férias, 13º salário e horas extras com as tabelas de INSS e IRRF de 2026. Tudo no navegador, sem cadastro."
+      />
+      <p className="font-mono text-xs text-texto-suave">01 / calculadoras</p>
       <h1 className="mt-2 text-4xl leading-tight">
         Calculadoras trabalhistas <span className="text-menta">grátis</span>
       </h1>
-      <p className="text-texto-suave mt-4 max-w-2xl text-lg">
+      <p className="mt-4 max-w-2xl text-lg text-texto-suave">
         Rescisão, férias, 13º e horas extras com o cálculo linha a linha. Tudo roda no seu
         navegador: nenhum dado é enviado.
       </p>
@@ -31,11 +38,11 @@ export default function Home() {
           <li key={c.caminho}>
             <Link
               to={c.caminho}
-              className="border-linha bg-superficie text-texto hover:border-menta block h-full rounded-md border p-6 transition-colors"
+              className="block h-full rounded-md border border-linha bg-superficie p-6 text-texto transition-colors hover:border-menta"
             >
-              <span className="text-menta font-mono text-xs">{String(i + 1).padStart(2, '0')}</span>
+              <span className="font-mono text-xs text-menta">{String(i + 1).padStart(2, '0')}</span>
               <h2 className="mt-2 text-2xl">{c.titulo}</h2>
-              <p className="text-texto-suave mt-1 text-sm">{c.descricao}</p>
+              <p className="mt-1 text-sm text-texto-suave">{c.descricao}</p>
             </Link>
           </li>
         ))}
