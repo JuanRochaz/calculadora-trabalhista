@@ -196,6 +196,13 @@ export function CampoSelecao({ id, rotulo, ajuda, opcoes, valor, aoMudar }: Prop
   )
 }
 
+// Classes literais para o Tailwind encontrar.
+const colunasOpcoes: Record<number, string> = {
+  2: 'sm:grid-cols-2',
+  3: 'sm:grid-cols-3',
+  4: 'sm:grid-cols-2 lg:grid-cols-4',
+}
+
 interface PropsOpcoes<T extends string> {
   nome: string
   rotulo: string
@@ -215,7 +222,7 @@ export function CampoOpcoes<T extends string>({
   return (
     <fieldset>
       <legend className="mb-2 text-sm font-medium">{rotulo}</legend>
-      <div className="grid gap-2 sm:grid-cols-3">
+      <div className={`grid gap-2 ${colunasOpcoes[opcoes.length] ?? 'sm:grid-cols-3'}`}>
         {opcoes.map((o) => (
           <label
             key={o.valor}
@@ -243,6 +250,39 @@ export function CampoOpcoes<T extends string>({
         ))}
       </div>
     </fieldset>
+  )
+}
+
+interface PropsCaixa {
+  id: string
+  rotulo: string
+  ajuda?: string
+  marcado: boolean
+  aoMudar: (marcado: boolean) => void
+}
+
+export function CampoCaixa({ id, rotulo, ajuda, marcado, aoMudar }: PropsCaixa) {
+  return (
+    <div className="flex items-start gap-3">
+      <input
+        id={id}
+        type="checkbox"
+        checked={marcado}
+        aria-describedby={ajuda ? `${id}-ajuda` : undefined}
+        onChange={(e) => aoMudar(e.target.checked)}
+        className="mt-1 size-4 accent-menta"
+      />
+      <div>
+        <label htmlFor={id} className="text-sm font-medium">
+          {rotulo}
+        </label>
+        {ajuda && (
+          <p id={`${id}-ajuda`} className="text-xs text-texto-suave">
+            {ajuda}
+          </p>
+        )}
+      </div>
+    </div>
   )
 }
 
