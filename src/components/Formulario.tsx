@@ -100,12 +100,22 @@ interface PropsInteiro {
   id: string
   rotulo: string
   ajuda?: string
-  valor: number
-  aoMudar: (n: number) => void
+  /** `null` quando o campo está em branco. */
+  valor: number | null
+  aoMudar: (n: number | null) => void
   max?: number
+  placeholder?: string
 }
 
-export function CampoInteiro({ id, rotulo, ajuda, valor, aoMudar, max = 99 }: PropsInteiro) {
+export function CampoInteiro({
+  id,
+  rotulo,
+  ajuda,
+  valor,
+  aoMudar,
+  max = 99,
+  placeholder,
+}: PropsInteiro) {
   return (
     <Rotulo id={id} rotulo={rotulo} ajuda={ajuda}>
       <input
@@ -115,10 +125,17 @@ export function CampoInteiro({ id, rotulo, ajuda, valor, aoMudar, max = 99 }: Pr
         min={0}
         max={max}
         step={1}
+        placeholder={placeholder}
         aria-describedby={ajuda ? `${id}-ajuda` : undefined}
         className={`${classeCampo} font-mono`}
-        value={valor}
-        onChange={(e) => aoMudar(Math.max(0, Math.min(max, Math.trunc(Number(e.target.value)))))}
+        value={valor ?? ''}
+        onChange={(e) =>
+          aoMudar(
+            e.target.value === ''
+              ? null
+              : Math.max(0, Math.min(max, Math.trunc(Number(e.target.value)))),
+          )
+        }
       />
     </Rotulo>
   )

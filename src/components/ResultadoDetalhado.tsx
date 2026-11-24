@@ -1,6 +1,9 @@
 import type { Resultado } from '../calc/resultado'
 import { formatarReais } from '../calc/util'
 
+const formatarDesconto = (centavos: number) =>
+  centavos === 0 ? formatarReais(0) : `− ${formatarReais(centavos)}`
+
 interface Props {
   titulo: string
   resultado: Resultado
@@ -54,7 +57,7 @@ export default function ResultadoDetalhado({ titulo, resultado, resumo }: Props)
                   {l.tipo === 'provento' ? formatarReais(l.valorCentavos) : ''}
                 </td>
                 <td className="px-4 py-3 text-right text-erro">
-                  {l.tipo === 'desconto' ? `− ${formatarReais(l.valorCentavos)}` : ''}
+                  {l.tipo === 'desconto' ? formatarDesconto(l.valorCentavos) : ''}
                 </td>
               </tr>
             ))}
@@ -68,9 +71,7 @@ export default function ResultadoDetalhado({ titulo, resultado, resumo }: Props)
                 {formatarReais(resultado.totalProventosCentavos)}
               </td>
               <td className="px-4 py-3 text-right text-erro">
-                {resultado.totalDescontosCentavos > 0
-                  ? `− ${formatarReais(resultado.totalDescontosCentavos)}`
-                  : formatarReais(0)}
+                {formatarDesconto(resultado.totalDescontosCentavos)}
               </td>
             </tr>
           </tfoot>

@@ -1,10 +1,6 @@
 import { useState, type FormEvent } from 'react'
-import {
-  calcularDecimo,
-  EntradaInvalidaError,
-  type ResultadoDecimo,
-  type TipoDecimo,
-} from '../calc/decimo'
+import { calcularDecimo, type ResultadoDecimo, type TipoDecimo } from '../calc/decimo'
+import { EntradaInvalidaError } from '../calc/erros'
 import { formatarReais } from '../calc/util'
 import {
   BotaoCalcular,
@@ -140,7 +136,7 @@ export default function Decimo() {
                 id="dependentes"
                 rotulo="Dependentes para o IR"
                 valor={dependentes}
-                aoMudar={setDependentes}
+                aoMudar={(n) => setDependentes(n ?? 0)}
               />
               <CampoMoeda
                 id="pensao"
