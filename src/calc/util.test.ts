@@ -6,6 +6,7 @@ import {
   avosPorPeriodo,
   diasCorridosInclusive,
   diasEntreDatas,
+  formatarDataBr,
   formatarReais,
   lerData,
   somarMeses,
@@ -103,5 +104,11 @@ describe('arredondamento e formato', () => {
 
   it('formata em reais', () => {
     expect(formatarReais(123456).replace(/\s/g, ' ')).toBe('R$ 1.234,56')
+  })
+})
+
+describe('formatarDataBr', () => {
+  it('converte ISO para dd/mm/aaaa', () => {
+    expect(formatarDataBr('2026-06-10')).toBe('10/06/2026')
   })
 })

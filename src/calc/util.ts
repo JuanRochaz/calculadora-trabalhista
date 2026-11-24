@@ -139,3 +139,9 @@ const formatoReais = new Intl.NumberFormat('pt-BR', { style: 'currency', currenc
 export function formatarReais(centavos: number): string {
   return formatoReais.format(centavos / 100)
 }
+
+/** "2026-06-10" → "10/06/2026". Usar só na tela/PDF. */
+export function formatarDataBr(iso: string): string {
+  const [ano, mes, dia] = iso.split('-')
+  return `${dia}/${mes}/${ano}`
+}
