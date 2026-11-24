@@ -20,6 +20,10 @@ npm run build
 - `src/calc/` — regras de cálculo puras (sem React), cada uma com testes. Valores em centavos.
 - `src/config/tabelas-AAAA.ts` — INSS, IRRF, dedução por dependente e salário mínimo.
 - `src/pages/` e `src/components/` — telas.
+- `src/pdf/` — geração do resultado em PDF.
+- `src/seo/paginas.json` — título e descrição de cada página. No build,
+  `scripts/gerar-paginas.mjs` grava um HTML por rota com essas tags, Open Graph e JSON-LD,
+  além de `sitemap.xml`, `robots.txt` e `404.html`.
 
 ## Como atualizar as tabelas
 
