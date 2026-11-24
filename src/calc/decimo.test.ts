@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { tabelas2026 } from '../config/tabelas-2026'
-import { calcularDecimo, EntradaInvalidaError, type EntradaDecimo } from './decimo'
+import { calcularDecimo, type EntradaDecimo } from './decimo'
+import { EntradaInvalidaError } from './erros'
 
 // Casos com valores fictícios, calculados com as tabelas oficiais de 2026.
 const calcular = (entrada: EntradaDecimo) => calcularDecimo(entrada, tabelas2026)

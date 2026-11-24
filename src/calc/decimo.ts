@@ -14,6 +14,7 @@
  */
 import type { TabelasAno } from '../config/tabelas-2026'
 import { calcularInss, calcularIrrf } from './descontos'
+import { EntradaInvalidaError } from './erros'
 import { montarResultado, referenciaIrrf, type Linha, type Resultado } from './resultado'
 import { arredondarCentavos, avosPorMesCivil, lerData } from './util'
 
@@ -39,13 +40,6 @@ export interface EntradaDecimo {
 export interface ResultadoDecimo extends Resultado {
   avos: number
   valorDecimoCentavos: number
-}
-
-export class EntradaInvalidaError extends Error {
-  constructor(mensagem: string) {
-    super(mensagem)
-    this.name = 'EntradaInvalidaError'
-  }
 }
 
 export function calcularDecimo(entrada: EntradaDecimo, tabelas: TabelasAno): ResultadoDecimo {
