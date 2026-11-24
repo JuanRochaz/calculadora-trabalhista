@@ -13,6 +13,7 @@ import {
 import ResultadoDetalhado from '../components/ResultadoDetalhado'
 import { tabelasVigentes } from '../config/tabelas'
 import type { ItemPdf } from '../pdf/gerarPdf'
+import { usePagina } from '../seo/usePagina'
 
 /** Inclui o item só se o valor existir (para os campos opcionais no PDF). */
 const se = (condicao: unknown, item: ItemPdf): ItemPdf[] => (condicao ? [item] : [])
@@ -32,6 +33,7 @@ const titulos: Record<TipoDecimo, string> = {
 }
 
 export default function Decimo() {
+  usePagina('/decimo-terceiro/')
   const [tipo, setTipo] = useState<TipoDecimo>('segunda')
   const [salario, setSalario] = useState<number | null>(null)
   const [media, setMedia] = useState<number | null>(null)
@@ -95,12 +97,6 @@ export default function Decimo() {
 
   return (
     <section>
-      <title>Calculadora de 13º salário 2026: 1ª e 2ª parcela e proporcional | JR Dev</title>
-      <meta
-        name="description"
-        content="Calcule grátis o 13º salário de 2026: 1ª parcela, 2ª parcela com INSS e IRRF (com a redução de 2026) e 13º proporcional na rescisão."
-      />
-
       <p className="font-mono text-xs text-texto-suave">01 / 13º salário</p>
       <h1 className="mt-2 text-4xl leading-tight">
         Calculadora de <span className="text-menta">13º salário</span>

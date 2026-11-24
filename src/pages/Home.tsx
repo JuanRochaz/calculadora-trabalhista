@@ -1,30 +1,25 @@
 import { Link } from 'react-router'
+import { usePagina } from '../seo/usePagina'
 
 const calculadoras = [
   {
-    caminho: '/rescisao',
+    caminho: '/rescisao/',
     titulo: 'Rescisão',
     descricao: 'Verbas rescisórias por tipo de desligamento.',
   },
-  { caminho: '/ferias', titulo: 'Férias', descricao: 'Integrais, proporcionais, 1/3 e abono.' },
+  { caminho: '/ferias/', titulo: 'Férias', descricao: 'Integrais, proporcionais, 1/3 e abono.' },
   {
-    caminho: '/decimo-terceiro',
+    caminho: '/decimo-terceiro/',
     titulo: '13º salário',
     descricao: '1ª e 2ª parcela e proporcional.',
   },
-  { caminho: '/horas-extras', titulo: 'Horas extras', descricao: '50%, 100% e reflexo no DSR.' },
+  { caminho: '/horas-extras/', titulo: 'Horas extras', descricao: '50%, 100% e reflexo no DSR.' },
 ]
 
 export default function Home() {
+  usePagina('/')
   return (
     <section>
-      <title>
-        Calculadoras trabalhistas grátis 2026: rescisão, férias, 13º e horas extras | JR Dev
-      </title>
-      <meta
-        name="description"
-        content="Calcule de graça rescisão, férias, 13º salário e horas extras com as tabelas de INSS e IRRF de 2026. Tudo no navegador, sem cadastro."
-      />
       <p className="font-mono text-xs text-texto-suave">01 / calculadoras</p>
       <h1 className="mt-2 text-4xl leading-tight">
         Calculadoras trabalhistas <span className="text-menta">grátis</span>

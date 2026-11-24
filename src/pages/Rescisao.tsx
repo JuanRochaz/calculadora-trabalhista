@@ -20,6 +20,7 @@ import {
 import ResultadoDetalhado from '../components/ResultadoDetalhado'
 import { tabelasVigentes } from '../config/tabelas'
 import type { ItemPdf, SecaoPdf } from '../pdf/gerarPdf'
+import { usePagina } from '../seo/usePagina'
 
 /** Inclui o item só se o valor existir (para os campos opcionais no PDF). */
 const se = (condicao: unknown, item: ItemPdf): ItemPdf[] => (condicao ? [item] : [])
@@ -72,6 +73,7 @@ function secaoFgtsPdf(tipo: TipoRescisao, dados: ResultadoRescisao): SecaoPdf {
 }
 
 export default function Rescisao() {
+  usePagina('/rescisao/')
   const [tipo, setTipo] = useState<TipoRescisao>('semJustaCausa')
   const [aviso, setAviso] = useState<TipoAviso>('indenizado')
   const [salario, setSalario] = useState<number | null>(null)
@@ -181,14 +183,6 @@ export default function Rescisao() {
 
   return (
     <section>
-      <title>
-        Calculadora de rescisão 2026: sem justa causa, pedido, acordo e justa causa | JR Dev
-      </title>
-      <meta
-        name="description"
-        content="Calcule grátis a rescisão de 2026: saldo de salário, aviso prévio proporcional, 13º, férias + 1/3, multa do FGTS, INSS e IRRF. Sem justa causa, pedido de demissão, acordo e justa causa."
-      />
-
       <p className="font-mono text-xs text-texto-suave">01 / rescisão</p>
       <h1 className="mt-2 text-4xl leading-tight">
         Calculadora de <span className="text-menta">rescisão</span>

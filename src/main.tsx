@@ -7,6 +7,7 @@ import Decimo from './pages/Decimo'
 import Ferias from './pages/Ferias'
 import Home from './pages/Home'
 import HoraExtra from './pages/HoraExtra'
+import NaoEncontrada from './pages/NaoEncontrada'
 import Rescisao from './pages/Rescisao'
 
 createRoot(document.getElementById('root')!).render(
@@ -19,6 +20,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="ferias" element={<Ferias />} />
           <Route path="decimo-terceiro" element={<Decimo />} />
           <Route path="horas-extras" element={<HoraExtra />} />
+          <Route path="*" element={<NaoEncontrada />} />
         </Route>
       </Routes>
     </BrowserRouter>

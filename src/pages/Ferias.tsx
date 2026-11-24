@@ -13,6 +13,7 @@ import ResultadoDetalhado from '../components/ResultadoDetalhado'
 import { formatarDataBr, formatarReais } from '../calc/util'
 import { tabelasVigentes } from '../config/tabelas'
 import type { ItemPdf } from '../pdf/gerarPdf'
+import { usePagina } from '../seo/usePagina'
 
 /** Inclui o item só se o valor existir (para os campos opcionais no PDF). */
 const se = (condicao: unknown, item: ItemPdf): ItemPdf[] => (condicao ? [item] : [])
@@ -33,6 +34,7 @@ const tipos: { valor: TipoFerias; rotulo: string; descricao: string }[] = [
 const formatoDias = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 })
 
 export default function Ferias() {
+  usePagina('/ferias/')
   const [tipo, setTipo] = useState<TipoFerias>('gozo')
   const [salario, setSalario] = useState<number | null>(null)
   const [media, setMedia] = useState<number | null>(null)
@@ -111,12 +113,6 @@ export default function Ferias() {
 
   return (
     <section>
-      <title>Calculadora de férias 2026: 1/3, abono e proporcionais | JR Dev</title>
-      <meta
-        name="description"
-        content="Calcule grátis as férias de 2026 com 1/3 constitucional, venda de 10 dias (abono pecuniário), INSS e IRRF com a redução de 2026, e férias proporcionais na rescisão."
-      />
-
       <p className="font-mono text-xs text-texto-suave">01 / férias</p>
       <h1 className="mt-2 text-4xl leading-tight">
         Calculadora de <span className="text-menta">férias</span>

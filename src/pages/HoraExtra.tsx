@@ -19,6 +19,7 @@ import {
 import ResultadoDetalhado from '../components/ResultadoDetalhado'
 import { tabelasVigentes } from '../config/tabelas'
 import type { ItemPdf } from '../pdf/gerarPdf'
+import { usePagina } from '../seo/usePagina'
 
 /** Inclui o item só se o valor existir (para os campos opcionais no PDF). */
 const se = (condicao: unknown, item: ItemPdf): ItemPdf[] => (condicao ? [item] : [])
@@ -50,6 +51,7 @@ function mesInicial(): string {
 }
 
 export default function HoraExtra() {
+  usePagina('/horas-extras/')
   const [salario, setSalario] = useState<number | null>(null)
   const [jornada, setJornada] = useState<number | null>(44)
   const [divisor, setDivisor] = useState<number | null>(null)
@@ -113,12 +115,6 @@ export default function HoraExtra() {
 
   return (
     <section>
-      <title>Calculadora de horas extras 2026: 50%, 100% e DSR | JR Dev</title>
-      <meta
-        name="description"
-        content="Calcule grátis as horas extras de 50% e 100%, o reflexo no DSR e o salário líquido do mês com INSS e IRRF de 2026."
-      />
-
       <p className="font-mono text-xs text-texto-suave">01 / horas extras</p>
       <h1 className="mt-2 text-4xl leading-tight">
         Calculadora de <span className="text-menta">horas extras</span>
