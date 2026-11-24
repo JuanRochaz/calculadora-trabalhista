@@ -44,6 +44,8 @@ export interface EntradaIrrf {
   pensaoAlimenticiaCentavos?: number
   /** Aplica a redução mensal de 2026 (vale também para o 13º). Padrão: sim. */
   aplicarReducao?: boolean
+  /** Permite trocar as deduções legais pelo desconto simplificado. No 13º: não. Padrão: sim. */
+  permitirDescontoSimplificado?: boolean
 }
 
 export interface ResultadoIrrf {
@@ -74,7 +76,8 @@ export function calcularIrrf(entrada: EntradaIrrf, tabela: TabelaIrrf): Resultad
     (entrada.pensaoAlimenticiaCentavos ?? 0)
 
   // Usa o que for melhor para o empregado.
-  const usouDescontoSimplificado = descontoSimplificado > deducoesLegais
+  const usouDescontoSimplificado =
+    entrada.permitirDescontoSimplificado !== false && descontoSimplificado > deducoesLegais
   const deducao = usouDescontoSimplificado ? descontoSimplificado : deducoesLegais
   const base = Math.max(0, rendimento - deducao)
 
