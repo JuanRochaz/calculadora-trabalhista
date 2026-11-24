@@ -31,8 +31,13 @@ jobs:
       - run: npm run build
         env:
           BASE_PATH: /${{ github.event.repository.name }}/
-      # Rotas como /ferias abrem direto: o GitHub Pages devolve o 404.html, que é o próprio app.
-      - run: cp dist/index.html dist/404.html
+      # O GitHub Pages não tem reescrita de rotas: cada rota ganha seu index.html (status 200,
+      # indexável pelo Google) e o 404.html cobre o resto.
+      - run: |
+          for rota in rescisao ferias decimo-terceiro horas-extras; do
+            mkdir -p "dist/$rota" && cp dist/index.html "dist/$rota/index.html"
+          done
+          cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v3
         if: github.ref == 'refs/heads/main'
         with:
