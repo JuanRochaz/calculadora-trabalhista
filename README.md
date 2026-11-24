@@ -31,7 +31,7 @@ As funções de cálculo não mudam. Os testes usam tabelas fictícias.
 
 ## Status
 
-Em desenvolvimento. As tabelas de 2026 ainda não foram preenchidas.
+Em desenvolvimento. Tabelas de 2026 (INSS, IRRF com desconto simplificado e redução da Lei nº 15.270/2025, salário mínimo) preenchidas e conferidas.
 
 ---
 

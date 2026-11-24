@@ -11,8 +11,8 @@ const MS_POR_DIA = 24 * 60 * 60 * 1000
 export const DIAS_MINIMOS_AVO = 15
 
 /**
- * No mês da admissão, o avo conta se a admissão foi até este dia (regra do Juan).
- * TODO(Juan): confirmar se o próprio dia 15 conta.
+ * No mês da admissão, o avo conta se a admissão foi até este dia, inclusive
+ * (regra do Juan: dia 15 conta, dia 16 não conta).
  */
 export const DIA_LIMITE_ADMISSAO = 15
 

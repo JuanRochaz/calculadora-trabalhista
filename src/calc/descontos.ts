@@ -42,7 +42,7 @@ export interface EntradaIrrf {
   inssCentavos: number
   dependentes: number
   pensaoAlimenticiaCentavos?: number
-  /** Aplica a redução mensal de 2026. TODO(Juan): confirmar se vale para o 13º. */
+  /** Aplica a redução mensal de 2026 (vale também para o 13º). Padrão: sim. */
   aplicarReducao?: boolean
 }
 
