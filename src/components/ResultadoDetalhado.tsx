@@ -32,8 +32,44 @@ export default function ResultadoDetalhado({ titulo, resultado, resumo, pdf }: P
         </dl>
       )}
 
-      <div className="mt-6 overflow-x-auto rounded-md border border-linha">
-        <table className="w-full min-w-[520px] text-sm">
+      {/* Celular: lista com o valor sempre visível ao lado de cada verba */}
+      <div className="mt-6 overflow-hidden rounded-md border border-linha sm:hidden">
+        <ul className="divide-y divide-linha text-sm">
+          {resultado.linhas.map((l) => (
+            <li key={l.descricao} className="flex items-start justify-between gap-4 px-4 py-3">
+              <div>
+                <p>{l.descricao}</p>
+                {l.referencia && (
+                  <p className="font-mono text-xs text-texto-suave">{l.referencia}</p>
+                )}
+              </div>
+              <span
+                className={`shrink-0 text-right font-mono ${l.tipo === 'desconto' ? 'text-erro' : ''}`}
+              >
+                {l.tipo === 'desconto'
+                  ? formatarDesconto(l.valorCentavos)
+                  : formatarReais(l.valorCentavos)}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <dl className="divide-y divide-linha border-t border-linha bg-superficie text-sm">
+          <div className="flex justify-between px-4 py-3">
+            <dt className="font-medium">Total de proventos</dt>
+            <dd className="font-mono">{formatarReais(resultado.totalProventosCentavos)}</dd>
+          </div>
+          <div className="flex justify-between px-4 py-3">
+            <dt className="font-medium">Total de descontos</dt>
+            <dd className="font-mono text-erro">
+              {formatarDesconto(resultado.totalDescontosCentavos)}
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      {/* Telas maiores: tabela completa */}
+      <div className="mt-6 hidden overflow-x-auto rounded-md border border-linha sm:block">
+        <table className="w-full text-sm">
           <thead className="bg-superficie text-left text-xs text-texto-suave">
             <tr>
               <th scope="col" className="px-4 py-3 font-medium">
